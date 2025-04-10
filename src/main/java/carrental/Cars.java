@@ -1,27 +1,23 @@
 package carrental;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
-import net.proteanit.sql.DbUtils;
+import java.io.FileWriter; // Library to export data 
+import java.io.IOException; // Error handling
+import java.sql.Connection; // Library to connect sql
+import java.sql.DriverManager; // Library to connect db
+import java.sql.Statement; // Library to prepare requests 
+import java.sql.PreparedStatement; // Library to prepare secure requests
+import java.sql.ResultSet; // Keeps result of request SELECT (Table with data)
+import java.sql.SQLException; //Error handling
+import javax.swing.JOptionPane; // To show pop-up windows
+import javax.swing.table.DefaultTableModel; // Library to work with JTable
+import net.proteanit.sql.DbUtils; // Library to work with JTable (To get data from db)
 
 
 
 
 public class Cars extends javax.swing.JFrame {
-
     
     public Cars() {
-        initComponents();
+        initComponents(); // Connecting with UI
         Connect();
         DisplayCars();
         Reset();
@@ -31,26 +27,26 @@ public class Cars extends javax.swing.JFrame {
     Statement St;
     ResultSet Rs;
 
+    // Connecting db
     public void Connect() {
     try {
-            // Загружаем драйвер PostgreSQL
+            // Installing driver
             Class.forName("org.postgresql.Driver");
             
-            // Подключаемся к базе данных
             Con = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/vehicledb",  // URL подключения
-                "sopakunovarslan",  // Имя пользователя базы данных
-                "911Spectre"        // Пароль
+                "jdbc:postgresql://localhost:5432/vehicledb",  // URL 
+                "sopakunovarslan",  
+                "911Spectre"        
             );
             
-            
-            // Сообщаем об успешном подключении
             System.out.println("Connected to the database successfully!");
 
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cars.class.getName()).log(Level.SEVERE, "PostgreSQL JDBC Driver not found!", ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(Cars.class.getName()).log(Level.SEVERE, "Database connection failed!", ex);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            System.out.println("Driver is not found");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Connection to database failed");
         }
     }
     
@@ -435,7 +431,8 @@ public class Cars extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
+    
+    // Clean input boxes
     private void Reset(){
         StateNumTb.setText("");
         BrandTb.setText("");
@@ -444,7 +441,8 @@ public class Cars extends javax.swing.JFrame {
         PriceTb.setText("");
         StateNumTb.requestFocus();
     }
-            
+    
+    // Display Cars on Table
     private void DisplayCars(){
         try{
             St = Con.createStatement();
@@ -458,102 +456,139 @@ public class Cars extends javax.swing.JFrame {
     
     
     private void UpdateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpdateBtnActionPerformed
-        if (StateNumTb.getText().isEmpty() || 
-        BrandTb.getText().isEmpty() || 
-        ModelTb.getText().isEmpty() || 
-        StatusCb.getSelectedIndex() == -1 || 
-        PriceTb.getText().isEmpty()) {
-
-        JOptionPane.showMessageDialog(this, "Please Select The Car To Be Updated!", "Input Error", JOptionPane.ERROR_MESSAGE);
-        return;
-        }
         
+        // Validate input fields
+        if (StateNumTb.getText().isEmpty() || 
+            BrandTb.getText().isEmpty() || 
+            ModelTb.getText().isEmpty() || 
+            StatusCb.getSelectedIndex() == -1 || 
+            PriceTb.getText().isEmpty()) {
+
+            JOptionPane.showMessageDialog(this, "Please select the car to be updated!", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Validate State Number
+        if (StateNumTb.getText().length() < 5) {
+            JOptionPane.showMessageDialog(this, "State Number is not correct!");
+            StateNumTb.setText("");
+            return;
+        }
+
+        // Validate and parse price
         int price;
         try {
-            price = Integer.parseInt(PriceTb.getText());
+            price = Integer.parseInt(PriceTb.getText().trim());
+
+            if (price > 300000) {
+                JOptionPane.showMessageDialog(this, "Maximum price for rent is 300000!");
+                PriceTb.setText("");
+                return;
+            }
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Price must be a valid number!", "Input Error", JOptionPane.ERROR_MESSAGE);
             PriceTb.setText("");
             return;
         }
-        
-        String Num = StateNumTb.getText();
-        String Brand = BrandTb.getText();
-        String Model = ModelTb.getText();
+
+        // Prepare update data
+        String Num = StateNumTb.getText().trim();
+        String Brand = BrandTb.getText().trim();
+        String Model = ModelTb.getText().trim();
         String Status = StatusCb.getSelectedItem().toString();
-        
-        String Query = "UPDATE cartable SET \"Brand\" = '" + Brand + 
-               "', \"Model\" = '" + Model + 
-               "', \"Status\" = '" + Status + 
-               "', \"Price\" = " + price + 
-               " WHERE \"StateNumber\" = '" + Num + "'";
 
-            try {
-                Statement St = Con.createStatement();
-                int k = St.executeUpdate(Query);
+        String Query = "UPDATE cartable SET \"Brand\" = ?, \"Model\" = ?, \"Status\" = ?, \"Price\" = ? WHERE \"StateNumber\" = ?";
 
-                if(k == 1){
-                    JOptionPane.showMessageDialog(this, "The Car Has Been Successfully Updated!");
-                    Reset();
-                    DisplayCars();
-                }else{
-                    JOptionPane.showMessageDialog(this, "Record Failed To Update!");
-                    Reset();
-                } 
-            } catch (SQLException e) {
-                e.printStackTrace(); // Print SQL errors
+        try {
+            PreparedStatement pst = Con.prepareStatement(Query);
+            pst.setString(1, Brand);
+            pst.setString(2, Model);
+            pst.setString(3, Status);
+            pst.setInt(4, price);
+            pst.setString(5, Num);
+
+            int k = pst.executeUpdate();
+
+            if (k == 1) {
+                JOptionPane.showMessageDialog(this, "The car has been successfully updated!");
+                Reset();
+                DisplayCars();
+            } else {
+                JOptionPane.showMessageDialog(this, "Record failed to update!");
+                Reset();
             }
+            pst.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Database error occurred!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_UpdateBtnActionPerformed
 
     private void SaveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveBtnActionPerformed
         
+            // Basic field validation
         if (StateNumTb.getText().isEmpty() || 
-        BrandTb.getText().isEmpty() || 
-        ModelTb.getText().isEmpty() || 
-        StatusCb.getSelectedIndex() == -1 || 
-        PriceTb.getText().isEmpty()) {
+            BrandTb.getText().isEmpty() || 
+            ModelTb.getText().isEmpty() || 
+            StatusCb.getSelectedIndex() == -1 || 
+            PriceTb.getText().isEmpty()) {
 
-        JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Input Error", JOptionPane.ERROR_MESSAGE);
-        return;
+            JOptionPane.showMessageDialog(this, "Please fill in all fields!", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
-        // Validating Price as an integer
+        // Validate StateNumber length
+        if (StateNumTb.getText().length() < 5) {
+            JOptionPane.showMessageDialog(this, "State Number is not correct!");
+            StateNumTb.setText("");
+            return;
+        }
+
+        // Validate Price as a number and within range
         int price;
         try {
-            price = Integer.parseInt(PriceTb.getText());
+            price = Integer.parseInt(PriceTb.getText().trim());
+
+            if (price > 300000) {
+                JOptionPane.showMessageDialog(this, "Maximum price for rent is 300000!");
+                PriceTb.setText("");
+                return;
+            }
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Price must be a valid number!", "Input Error", JOptionPane.ERROR_MESSAGE);
             PriceTb.setText("");
             return;
         }
 
+        // Save to database
         try {
             PreparedStatement add = Con.prepareStatement("INSERT INTO cartable VALUES(?,?,?,?,?)");
-            add.setString(1, StateNumTb.getText());
-            add.setString(2, BrandTb.getText());
-            add.setString(3, ModelTb.getText());
+            add.setString(1, StateNumTb.getText().trim());
+            add.setString(2, BrandTb.getText().trim());
+            add.setString(3, ModelTb.getText().trim());
             add.setString(4, StatusCb.getSelectedItem().toString());
             add.setInt(5, price);
 
             int k = add.executeUpdate();
-            
             JOptionPane.showMessageDialog(this, "Car Added Successfully!");
+
             DisplayCars();
             Reset();
-            
-            
-            add.close(); // Closing the statement to free resources
+            add.close();
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Car with this State Number already exists!");
             e.printStackTrace();
         }
+        
     }//GEN-LAST:event_SaveBtnActionPerformed
 
     private void ModelTbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ModelTbActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_ModelTbActionPerformed
 
     private void DeleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteBtnActionPerformed
+        
         String Num = StateNumTb.getText();
             String Query = "DELETE FROM cartable WHERE \"StateNumber\" = '" + Num + "'";
 
@@ -568,15 +603,16 @@ public class Cars extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(this, "Please Select The Car to Be Deleted!");
                 }
 
-                DisplayCars(); 
+                DisplayCars(); // Update Cars Table 
             } catch (SQLException e) {
-                e.printStackTrace(); // Print SQL errors
+                e.printStackTrace(); 
             }
     }//GEN-LAST:event_DeleteBtnActionPerformed
 
+    // Getting selected Car
     private void CarsTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CarsTableMouseClicked
-        DefaultTableModel model = (DefaultTableModel)CarsTable.getModel();
-        int MyIndex = CarsTable.getSelectedRow();
+        DefaultTableModel model = (DefaultTableModel)CarsTable.getModel(); //Connecting to table
+        int MyIndex = CarsTable.getSelectedRow(); // 
         StateNumTb.setText(model.getValueAt(MyIndex, 0).toString());
         BrandTb.setText(model.getValueAt(MyIndex, 1).toString());
         ModelTb.setText(model.getValueAt(MyIndex, 2).toString());
@@ -595,7 +631,7 @@ public class Cars extends javax.swing.JFrame {
 
     private void RentBTNMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_RentBTNMouseClicked
        new Rents().setVisible(true);
-        this.dispose();
+       this.dispose();
     }//GEN-LAST:event_RentBTNMouseClicked
 
     private void ReturnBTNMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ReturnBTNMouseClicked
@@ -617,13 +653,16 @@ public class Cars extends javax.swing.JFrame {
     }//GEN-LAST:event_lolMouseClicked
 
     private void ExportBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExportBtnActionPerformed
-        String filename = System.getProperty("user.home") + "/Desktop/Cars.csv";
+        
+        String filename = System.getProperty("user.home") + "/Desktop/Cars.csv"; // Creating csv file on Desktop
+        
         PreparedStatement pst;
         try {
             FileWriter fout = new FileWriter(filename);
             pst = Con.prepareStatement("SELECT * FROM cartable");
             Rs = pst.executeQuery();
-
+            
+            // Going throw table in db and getting datas
             while(Rs.next()){
                 fout.append(Rs.getString(1));
                 fout.append(",");
@@ -640,24 +679,21 @@ public class Cars extends javax.swing.JFrame {
             fout.flush();
             fout.close();
             
-        } catch (IOException ex) {
-            Logger.getLogger(Cars.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(Cars.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }//GEN-LAST:event_ExportBtnActionPerformed
 
     public static void main(String args[]) {
-        
-
-        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Cars().setVisible(true);
             }
         });
     }
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField BrandTb;
     private javax.swing.JTable CarsTable;

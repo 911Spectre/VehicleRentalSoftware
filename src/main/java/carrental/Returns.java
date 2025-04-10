@@ -7,8 +7,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 import net.proteanit.sql.DbUtils;
 import java.sql.Date;
@@ -30,7 +28,8 @@ public class Returns extends javax.swing.JFrame {
         
         CustCb.setEditable(false);
         StateNumTb.setEditable(false);
-        RentIdTb.setEditable(false);
+        DelayTb.setEditable(false);
+        FineTb.setEditable(false);
     }
     
     Connection Con;
@@ -39,30 +38,26 @@ public class Returns extends javax.swing.JFrame {
 
     public void Connect() {
     try {
-            // Загружаем драйвер PostgreSQL
             Class.forName("org.postgresql.Driver");
             
-            // Подключаемся к базе данных
             Con = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/vehicledb",  // URL подключения
-                "sopakunovarslan",  // Имя пользователя базы данных
-                "911Spectre"        // Пароль
+                "jdbc:postgresql://localhost:5432/vehicledb", 
+                "sopakunovarslan",  
+                "911Spectre"        
             );
             
-            
-            // Сообщаем об успешном подключении
             System.out.println("Connected to the database successfully!");
 
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cars.class.getName()).log(Level.SEVERE, "PostgreSQL JDBC Driver not found!", ex);
+            ex.printStackTrace();
+            System.out.print("PostgreSQL JDBC Driver not found!");
         } catch (SQLException ex) {
-            Logger.getLogger(Cars.class.getName()).log(Level.SEVERE, "Database connection failed!", ex);
+            ex.printStackTrace();
+            System.out.print("Database connection failed!");
         }
     }
     
-    
     private void Reset(){
-        RentIdTb.setText("");
         StateNumTb.setText("");
         CustCb.setSelectedIndex(-1);
         ReturnDate.setDate(null);
@@ -83,20 +78,10 @@ public class Returns extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
-    
+        
     private void UpdateRentStatus(){
-        
-        int id;
-        try {
-            id = Integer.parseInt(RentIdTb.getText());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Id must be a valid number!", "Input Error", JOptionPane.ERROR_MESSAGE);
-            RentIdTb.setText("");
-            return;
-        }
-        
-        String Query = "DELETE FROM renttable WHERE \"RentId\" = '" + id + "'";
+                
+        String Query = "DELETE FROM renttable WHERE \"CarStateNum\" = '" + StateNumTb.getText().toString() + "'";
         
         try {
                 Statement St = Con.createStatement();
@@ -131,7 +116,7 @@ public class Returns extends javax.swing.JFrame {
         if (k > 0) {
             System.out.println("Car status updated to 'Available' for StateNumber: " + StateNum);
         } else {
-            System.out.println("No car found with StateNumber: " + StateNum);
+            
         }
 
         Reset();
@@ -139,10 +124,7 @@ public class Returns extends javax.swing.JFrame {
         e.printStackTrace();
     }
 }
-
-
-    
-            
+                
     private void DisplayRents(){
         try{
             St = Con.createStatement();
@@ -179,8 +161,6 @@ public class Returns extends javax.swing.JFrame {
         lol = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         ExitBtn = new javax.swing.JLabel();
-        RentIdTb = new javax.swing.JTextField();
-        jLabel11 = new javax.swing.JLabel();
         StateNumTb = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
         ReturnDate = new com.toedter.calendar.JDateChooser();
@@ -200,6 +180,8 @@ public class Returns extends javax.swing.JFrame {
         jLabel19 = new javax.swing.JLabel();
         GenerateBtn = new javax.swing.JButton();
         CustCb = new javax.swing.JComboBox<>();
+        jLabel18 = new javax.swing.JLabel();
+        ResetBtn = new javax.swing.JButton();
 
         jLabel15.setBackground(new java.awt.Color(255, 255, 255));
         jLabel15.setFont(new java.awt.Font("Skia", 0, 16)); // NOI18N
@@ -320,17 +302,6 @@ public class Returns extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        RentIdTb.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                RentIdTbActionPerformed(evt);
-            }
-        });
-
-        jLabel11.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel11.setFont(new java.awt.Font("Skia", 0, 16)); // NOI18N
-        jLabel11.setForeground(new java.awt.Color(0, 102, 102));
-        jLabel11.setText("Rent ID");
-
         jLabel12.setBackground(new java.awt.Color(255, 255, 255));
         jLabel12.setFont(new java.awt.Font("Skia", 0, 16)); // NOI18N
         jLabel12.setForeground(new java.awt.Color(0, 102, 102));
@@ -382,17 +353,17 @@ public class Returns extends javax.swing.JFrame {
         RentsTable.setForeground(new java.awt.Color(255, 255, 255));
         RentsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "Rent ID", "State Number", "Customer", "Rent Date", "Return Date", "Fee"
+                "State Number", "Customer", "Rent Date", "Return Date", "Fee"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -412,7 +383,6 @@ public class Returns extends javax.swing.JFrame {
             RentsTable.getColumnModel().getColumn(2).setResizable(false);
             RentsTable.getColumnModel().getColumn(3).setResizable(false);
             RentsTable.getColumnModel().getColumn(4).setResizable(false);
-            RentsTable.getColumnModel().getColumn(5).setResizable(false);
         }
 
         ReturnsTable.setBackground(new java.awt.Color(0, 102, 102));
@@ -420,17 +390,17 @@ public class Returns extends javax.swing.JFrame {
         ReturnsTable.setForeground(new java.awt.Color(255, 255, 255));
         ReturnsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "Rent ID", "State Number", "Customer", "Return Date", "Delay", "Fine"
+                "State Number", "Customer", "Return Date", "Delay", "Fine"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, true, false, false, false
+                false, true, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -446,16 +416,15 @@ public class Returns extends javax.swing.JFrame {
         jScrollPane2.setViewportView(ReturnsTable);
         if (ReturnsTable.getColumnModel().getColumnCount() > 0) {
             ReturnsTable.getColumnModel().getColumn(0).setResizable(false);
-            ReturnsTable.getColumnModel().getColumn(1).setResizable(false);
+            ReturnsTable.getColumnModel().getColumn(2).setResizable(false);
             ReturnsTable.getColumnModel().getColumn(3).setResizable(false);
             ReturnsTable.getColumnModel().getColumn(4).setResizable(false);
-            ReturnsTable.getColumnModel().getColumn(5).setResizable(false);
         }
 
         jLabel16.setBackground(new java.awt.Color(255, 255, 255));
         jLabel16.setFont(new java.awt.Font("Skia", 1, 24)); // NOI18N
         jLabel16.setForeground(new java.awt.Color(0, 102, 102));
-        jLabel16.setText("Cars on Rental");
+        jLabel16.setText("Cars on Rent");
 
         jLabel17.setBackground(new java.awt.Color(255, 255, 255));
         jLabel17.setFont(new java.awt.Font("Skia", 1, 24)); // NOI18N
@@ -484,6 +453,20 @@ public class Returns extends javax.swing.JFrame {
         CustCb.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 102, 102)));
         CustCb.setPreferredSize(new java.awt.Dimension(96, 26));
 
+        jLabel18.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel18.setFont(new java.awt.Font("Skia", 0, 16)); // NOI18N
+        jLabel18.setForeground(new java.awt.Color(0, 102, 102));
+        jLabel18.setText("count");
+
+        ResetBtn.setFont(new java.awt.Font("Skia", 1, 18)); // NOI18N
+        ResetBtn.setForeground(new java.awt.Color(0, 102, 102));
+        ResetBtn.setText("Reset");
+        ResetBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ResetBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -492,27 +475,29 @@ public class Returns extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(52, 52, 52)
+                        .addGap(50, 50, 50)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(ReturnBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(StateNumTb)
-                            .addComponent(RentIdTb)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(4, 4, 4)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel20)
-                                    .addComponent(jLabel11)
                                     .addComponent(jLabel14)
                                     .addComponent(jLabel13)
                                     .addComponent(jLabel12)
                                     .addComponent(jLabel19)
                                     .addComponent(ReturnDate, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addComponent(DelayTb, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(CustCb, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(FineTb, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(GenerateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(CustCb, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel18)
+                                    .addComponent(GenerateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(ResetBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(2, 2, 2)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -530,31 +515,29 @@ public class Returns extends javax.swing.JFrame {
                             .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(ExportBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(375, 375, 375))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel16)
-                                .addGap(360, 360, 360))))))
+                                .addGap(375, 375, 375))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel16)
+                        .addGap(379, 379, 379))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(67, 67, 67)
+                .addGap(61, 61, 61)
                 .addComponent(jLabel16)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel17)
                         .addGap(12, 12, 12)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel11)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(RentIdTb, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(25, 25, 25)
+                        .addGap(57, 57, 57)
                         .addComponent(jLabel12)
                         .addGap(6, 6, 6)
                         .addComponent(StateNumTb, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -571,7 +554,9 @@ public class Returns extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(DelayTb, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(25, 25, 25)
-                        .addComponent(jLabel14)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel14)
+                            .addComponent(jLabel18))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -579,8 +564,9 @@ public class Returns extends javax.swing.JFrame {
                                 .addGap(25, 25, 25)
                                 .addComponent(ReturnBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(GenerateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(83, 83, 83)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                        .addGap(25, 25, 25)
+                        .addComponent(ResetBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(ExportBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(16, 16, 16))
         );
@@ -593,19 +579,18 @@ public class Returns extends javax.swing.JFrame {
     java.sql.Date MyRetDat;
     private void ReturnBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReturnBtnActionPerformed
         try {
-            int id = Integer.parseInt(RentIdTb.getText());
-
-            PreparedStatement pst = Con.prepareStatement("SELECT \"RentId\" FROM renttable WHERE \"RentId\" = ?");
-            pst.setInt(1, id);
+            String StateNumber = StateNumTb.getText().toString();
+            PreparedStatement pst = Con.prepareStatement("SELECT \"CarStateNum\" FROM renttable WHERE \"CarStateNum\" = ?");
+            pst.setString(1, StateNumber);
             ResultSet rs = pst.executeQuery();
 
             if (!rs.next()) {
-                JOptionPane.showMessageDialog(this, "The Rent with this ID does not exist!", "Input Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "The Rent with this State number does not exist!", "Input Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             if (
-                RentIdTb.getText().isEmpty() || StateNumTb.getText().isEmpty()
+                StateNumTb.getText().isEmpty()
                 || ReturnDate.getDate() == null || DelayTb.getText().isEmpty()
                 || FineTb.getText().isEmpty() || CustCb.getSelectedIndex() == -1) {
 
@@ -617,14 +602,13 @@ public class Returns extends javax.swing.JFrame {
             MyRetDat = new java.sql.Date(RetDat.getTime());
 
             PreparedStatement add = Con.prepareStatement(
-                "INSERT INTO returntable (\"RetId\", \"CarStateNum\", \"CustName\", \"RetDate\", \"Delay\", \"Fine\") VALUES (?, ?, ?, ?, ?, ?)");
+                "INSERT INTO returntable (\"CarStateNum\", \"CustName\", \"RetDate\", \"Delay\", \"Fine\") VALUES (?, ?, ?, ?, ?)");
 
-            add.setInt(1, id);
-            add.setString(2, StateNumTb.getText());
-            add.setString(3, CustCb.getSelectedItem().toString());
-            add.setDate(4, MyRetDat);
-            add.setInt(5, Integer.parseInt(DelayTb.getText()));
-            add.setInt(6, Integer.parseInt(FineTb.getText()));
+            add.setString(1, StateNumTb.getText());
+            add.setString(2, CustCb.getSelectedItem().toString());
+            add.setDate(3, MyRetDat);
+            add.setInt(4, Integer.parseInt(DelayTb.getText()));
+            add.setInt(5, Integer.parseInt(FineTb.getText()));
 
             int k = add.executeUpdate();
             
@@ -667,17 +651,15 @@ public class Returns extends javax.swing.JFrame {
                 fout.append(Rs.getString(4));
                 fout.append(",");
                 fout.append(Rs.getString(5));
-                fout.append(",");
-                fout.append(Rs.getString(6));
                 fout.append("\n");
             }
             fout.flush();
             fout.close();
             
         } catch (IOException ex) {
-            Logger.getLogger(Rents.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         } catch (SQLException ex) {
-            Logger.getLogger(Rents.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }
     
@@ -700,17 +682,15 @@ public class Returns extends javax.swing.JFrame {
                 fout.append(Rs.getString(4));
                 fout.append(",");
                 fout.append(Rs.getString(5));
-                fout.append(",");
-                fout.append(Rs.getString(6));
                 fout.append("\n");
             }
             fout.flush();
             fout.close();
             
         } catch (IOException ex) {
-            Logger.getLogger(Rents.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         } catch (SQLException ex) {
-            Logger.getLogger(Rents.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }
     
@@ -724,50 +704,109 @@ public class Returns extends javax.swing.JFrame {
         Reset();
         DefaultTableModel model = (DefaultTableModel)RentsTable.getModel();
         int MyIndex = RentsTable.getSelectedRow();
-        RentIdTb.setText(model.getValueAt(MyIndex, 0).toString());
-        StateNumTb.setText(model.getValueAt(MyIndex, 1).toString());
-        CustCb.setSelectedItem(model.getValueAt(MyIndex, 2).toString());
+        StateNumTb.setText(model.getValueAt(MyIndex, 0).toString());
+        CustCb.setSelectedItem(model.getValueAt(MyIndex, 1).toString());
     }//GEN-LAST:event_RentsTableMouseClicked
 
     private void ReturnsTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ReturnsTableMouseClicked
         Reset();
         DefaultTableModel model = (DefaultTableModel)ReturnsTable.getModel();
         int MyIndex = ReturnsTable.getSelectedRow();
-        RentIdTb.setText(model.getValueAt(MyIndex, 0).toString());
-        StateNumTb.setText(model.getValueAt(MyIndex, 1).toString());
-        CustCb.setSelectedItem(model.getValueAt(MyIndex, 2).toString());
-        ReturnDate.setDate((java.util.Date) model.getValueAt(MyIndex, 3));
-        DelayTb.setText(model.getValueAt(MyIndex, 4).toString());
-        FineTb.setText(model.getValueAt(MyIndex, 5).toString());
+        StateNumTb.setText(model.getValueAt(MyIndex, 0).toString());
+        CustCb.setSelectedItem(model.getValueAt(MyIndex, 1).toString());
+        ReturnDate.setDate((java.util.Date) model.getValueAt(MyIndex, 2));
+        DelayTb.setText(model.getValueAt(MyIndex, 3).toString());
+        FineTb.setText(model.getValueAt(MyIndex, 4).toString());
     }//GEN-LAST:event_ReturnsTableMouseClicked
 
-    private void RentIdTbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RentIdTbActionPerformed
-
-    }//GEN-LAST:event_RentIdTbActionPerformed
-
-    int Cost = 0;
     
     private void GenerateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GenerateBtnActionPerformed
-        try{
-            DefaultTableModel model = (DefaultTableModel)RentsTable.getModel();
-            int MyIndex = RentsTable.getSelectedRow();
-            Cost = Integer.valueOf(model.getValueAt(MyIndex, 5).toString());
-            
-            if(Cost == 0){
-                JOptionPane.showMessageDialog(this, "Select The Car To Return!");
-            }else{
-                int Fine = Cost * Integer.valueOf(DelayTb.getText());
-                FineTb.setText(""+Fine);
+       
+        try {
+        String StateNumber = StateNumTb.getText().toString();
+        
+        // 1. Request to get ReturnDate from renttable
+        String sql1 = "SELECT \"ReturnDate\" FROM renttable WHERE \"CarStateNum\" = ?";
+        PreparedStatement ps1 = Con.prepareStatement(sql1);
+        ps1.setString(1, StateNumber);  // Используем параметризацию запроса
+
+        ResultSet rs1 = ps1.executeQuery(); 
+        
+        if (rs1.next()) {
+            // Getting Return Date from db
+            Date dbReturnDate = rs1.getDate("ReturnDate");
+
+            // Getting Return date from DateChooser
+            java.util.Date utilReturnDate = ReturnDate.getDate();
+            java.sql.Date returnDate = new java.sql.Date(utilReturnDate.getTime());
+
+            // Counting difference
+            long diffInDays = (returnDate.getTime() - dbReturnDate.getTime()) / (1000 * 60 * 60 * 24);
+            int delayDays = (int) diffInDays;  // Parsing into Int
+
+            String delayDaysString = String.valueOf(delayDays);
+            if (delayDays <= 0) {
+                DelayTb.setText("0");
+            } else {
+                DelayTb.setText(delayDaysString);
             }
             
-        } catch(Exception e){
+            // Request to get price from cartable
+            String sql2 = "SELECT \"Price\" FROM cartable WHERE \"StateNumber\" = ?";
+            PreparedStatement ps2 = Con.prepareStatement(sql2);
+            ps2.setString(1, StateNumber);
+
+            ResultSet rs2 = ps2.executeQuery();
+            int price = 0;
+            if (rs2.next()) {
+                price = rs2.getInt("Price");
+            } else {
+                JOptionPane.showMessageDialog(this, "No price found for the given StateNumber.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Request to get fees from renttable
+            String sql3 = "SELECT \"RentFees\" FROM renttable WHERE \"CarStateNum\" = ?";
+            PreparedStatement ps3 = Con.prepareStatement(sql3);
+            ps3.setString(1, StateNumber);  
+
+            ResultSet rs3 = ps3.executeQuery();
+            int fees = 0;
+            if (rs3.next()) {
+                fees = rs3.getInt("RentFees");
+            } else {
+                JOptionPane.showMessageDialog(this, "No fees found for the given StateNumber.", "Error", JOptionPane.ERROR_MESSAGE);
+                return; 
+            }
+            
+            // If difference is less than 1 delay is 1
+            if (delayDays <= 0) {
+                delayDays = 0;
+            }
+            
+            // Counting fine 
+            int fine;
+            if(delayDays <= 0){
+                fine = fees;
+            }else{
+                fine = fees + (delayDays * price);
+            }
+           
+            FineTb.setText(String.valueOf(fine));
+
+            } else {
+                JOptionPane.showMessageDialog(this, "No record found with that StateNumber.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "An error occurred.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        
+
     }//GEN-LAST:event_GenerateBtnActionPerformed
 
     private void DelayTbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DelayTbActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_DelayTbActionPerformed
 
     private void CustomerBTNMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CustomerBTNMouseClicked
@@ -795,8 +834,16 @@ public class Returns extends javax.swing.JFrame {
     }//GEN-LAST:event_ExitBtnMouseClicked
 
     private void lolMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lolMouseClicked
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_lolMouseClicked
+
+    private void ResetBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResetBtnActionPerformed
+        StateNumTb.setText("");
+        CustCb.setSelectedIndex(-1);
+        ReturnDate.setDate(null);
+        DelayTb.setText("");
+        FineTb.setText("");
+    }//GEN-LAST:event_ResetBtnActionPerformed
 
     
     public static void main(String args[]) {
@@ -819,19 +866,19 @@ public class Returns extends javax.swing.JFrame {
     private javax.swing.JButton GenerateBtn;
     private javax.swing.JLabel LogoutBTN;
     private javax.swing.JLabel RentBTN;
-    private javax.swing.JTextField RentIdTb;
     private javax.swing.JTable RentsTable;
+    private javax.swing.JButton ResetBtn;
     private javax.swing.JButton ReturnBtn;
     private com.toedter.calendar.JDateChooser ReturnDate;
     private javax.swing.JTable ReturnsTable;
     private javax.swing.JTextField StateNumTb;
-    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JPanel jPanel1;

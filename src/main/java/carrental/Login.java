@@ -1,14 +1,12 @@
 package carrental;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import net.proteanit.sql.DbUtils;
+import java.sql.Connection; // Library to connect sql
+import java.sql.DriverManager; // To connect data base
+import java.sql.PreparedStatement; // To prepare secure request
+import java.sql.ResultSet; // Keeps result of request SELECT (Table with data)
+import java.sql.SQLException; // Data Base error handling
+import javax.swing.JOptionPane; // Shows pop-up windows
+import net.proteanit.sql.DbUtils;  // Simplifies loading data from a ResultSet into a JTable
 
 public class Login extends javax.swing.JFrame {
 
@@ -16,9 +14,10 @@ public class Login extends javax.swing.JFrame {
         initComponents();
         Reset();
         Connect();
-        setLocationRelativeTo(null); // Центрирует окно на экране
+        setLocationRelativeTo(null);
     }
     
+    // Function to clean unput boxes
     private void Reset(){
         UsernameTb.setText("");
         PasswordTb.setText("");
@@ -33,20 +32,19 @@ public class Login extends javax.swing.JFrame {
             // Загружаем драйвер PostgreSQL
             Class.forName("org.postgresql.Driver");
             
-            // Подключаемся к базе данных
+            // Connecting to db
             con = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/vehicledb",  // URL подключения
-                "sopakunovarslan",  // Имя пользователя базы данных
-                "911Spectre"        // Пароль
+                "jdbc:postgresql://localhost:5432/vehicledb",  // URL 
+                "sopakunovarslan",  // username 
+                "911Spectre"        // password
             );
             
-            // Сообщаем об успешном подключении
             System.out.println("Connected to the database successfully!");
 
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cars.class.getName()).log(Level.SEVERE, "PostgreSQL JDBC Driver not found!", ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(Cars.class.getName()).log(Level.SEVERE, "Database connection failed!", ex);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -70,6 +68,7 @@ public class Login extends javax.swing.JFrame {
         UsernameTb = new javax.swing.JTextField();
         PasswordTb = new javax.swing.JPasswordField();
         jPanel3 = new javax.swing.JPanel();
+        CreateBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 51, 153));
@@ -77,8 +76,6 @@ public class Login extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setForeground(new java.awt.Color(0, 51, 153));
-
-        jLabel2.setIcon(new javax.swing.ImageIcon("/Users/sopakunovarslan/Desktop/CarRental/src/main/java/carrental/img/blue-car-icon-13.png")); // NOI18N
 
         jLabel7.setBackground(new java.awt.Color(0, 51, 153));
         jLabel7.setFont(new java.awt.Font("Skia", 1, 18)); // NOI18N
@@ -100,31 +97,32 @@ public class Login extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(10, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel7)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addGap(9, 9, 9)))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                            .addComponent(jLabel9)
+                            .addGap(9, 9, 9))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGap(37, 37, 37)
+                            .addComponent(jLabel8)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel2))
                 .addGap(15, 15, 15))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(47, 47, 47)
-                .addComponent(jLabel8)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(92, 92, 92)
                 .addComponent(jLabel7)
                 .addGap(30, 30, 30)
                 .addComponent(jLabel8)
                 .addGap(29, 29, 29)
                 .addComponent(jLabel9)
-                .addContainerGap(67, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel2.setBackground(new java.awt.Color(0, 51, 153));
@@ -134,7 +132,7 @@ public class Login extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Skia", 1, 28)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Car Rental Software");
-        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(36, 69, 299, -1));
+        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 70, 299, -1));
 
         ResetBtn.setFont(new java.awt.Font("Skia", 1, 14)); // NOI18N
         ResetBtn.setForeground(new java.awt.Color(255, 255, 255));
@@ -144,14 +142,15 @@ public class Login extends javax.swing.JFrame {
                 ResetBtnMouseClicked(evt);
             }
         });
-        jPanel2.add(ResetBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 270, -1, -1));
+        jPanel2.add(ResetBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 270, -1, -1));
 
         jLabel5.setFont(new java.awt.Font("Skia", 1, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Password");
-        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 210, -1, -1));
+        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 210, -1, -1));
 
         LoginBtn.setFont(new java.awt.Font("Skia", 1, 12)); // NOI18N
+        LoginBtn.setForeground(new java.awt.Color(0, 51, 153));
         LoginBtn.setText("Login");
         LoginBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -163,7 +162,7 @@ public class Login extends javax.swing.JFrame {
                 LoginBtnActionPerformed(evt);
             }
         });
-        jPanel2.add(LoginBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 240, -1, -1));
+        jPanel2.add(LoginBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 240, -1, -1));
 
         ExitBtn.setFont(new java.awt.Font("Monospaced", 1, 24)); // NOI18N
         ExitBtn.setForeground(new java.awt.Color(255, 255, 255));
@@ -178,15 +177,15 @@ public class Login extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Skia", 1, 14)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Username");
-        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 160, -1, -1));
+        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 160, -1, -1));
 
         UsernameTb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 UsernameTbActionPerformed(evt);
             }
         });
-        jPanel2.add(UsernameTb, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 150, 160, 35));
-        jPanel2.add(PasswordTb, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 200, 160, 35));
+        jPanel2.add(UsernameTb, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 150, 160, 35));
+        jPanel2.add(PasswordTb, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 200, 160, 35));
 
         jPanel3.setBackground(new java.awt.Color(0, 51, 153));
         jPanel3.setForeground(new java.awt.Color(0, 51, 153));
@@ -204,19 +203,34 @@ public class Login extends javax.swing.JFrame {
 
         jPanel2.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 50, 20, 70));
 
+        CreateBtn.setFont(new java.awt.Font("Skia", 1, 12)); // NOI18N
+        CreateBtn.setForeground(new java.awt.Color(0, 51, 153));
+        CreateBtn.setText("Create");
+        CreateBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                CreateBtnMouseClicked(evt);
+            }
+        });
+        CreateBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CreateBtnActionPerformed(evt);
+            }
+        });
+        jPanel2.add(CreateBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 240, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
         );
 
         pack();
@@ -232,14 +246,21 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_ResetBtnMouseClicked
 
     private void LoginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoginBtnActionPerformed
+       
         if(UsernameTb.getText().isEmpty() || PasswordTb.getPassword().length == 0){
             JOptionPane.showMessageDialog(this, "Please fill in all fields ! ");
-        } else {
+        }else if (PasswordTb.getPassword().length < 5){
+            JOptionPane.showMessageDialog(this, "Password must have minimum 5 symbols! ");
+            return;
+        }else if(UsernameTb.getText().length() < 5){
+            JOptionPane.showMessageDialog(this, "Username must have minimum 5 symbols! ");
+            return;
+        }else {
             String user =  UsernameTb.getText();
             String pwd = new String(PasswordTb.getPassword());
 
             try {
-                String sql = "SELECT * FROM users";  // укажи правильное имя таблицы
+                String sql = "SELECT * FROM users"; 
                 pst = con.prepareStatement(sql);
                 rs = pst.executeQuery();
 
@@ -255,6 +276,7 @@ public class Login extends javax.swing.JFrame {
                     }
                 }
 
+                // if user exists and password is correct it gives access to the program
                 if (found) {
                     new Cars().setVisible(true);
                     this.dispose();
@@ -262,8 +284,8 @@ public class Login extends javax.swing.JFrame {
                     Reset();
                     JOptionPane.showMessageDialog(this, "Username or Password is incorrect!");
                 }
-            } catch (SQLException ex) {
-                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
         }     
@@ -278,11 +300,32 @@ public class Login extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_ExitBtnMouseClicked
 
-   
-    public static void main(String args[]) {
+    private void CreateBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CreateBtnMouseClicked
+
+    }//GEN-LAST:event_CreateBtnMouseClicked
+
+    // Function to create new user. (Only for administrators)
+    private void CreateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateBtnActionPerformed
         
+        if(UsernameTb.getText().isEmpty() || PasswordTb.getPassword().length == 0){
+            
+        JOptionPane.showMessageDialog(this, "Please fill in all fields ! ");
+        
+        } else {
+            String user =  UsernameTb.getText();
+            String pwd = new String(PasswordTb.getPassword());
 
+            if (user.equals("admin") && pwd.equals("admin")) {                
+                new CreateUser().setVisible(true);
+                this.dispose();
+            } else {
+                Reset();
+                JOptionPane.showMessageDialog(this, "Only Administrator can create a new user!");
+              }
+          }
+    }//GEN-LAST:event_CreateBtnActionPerformed
 
+    public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Login().setVisible(true);
@@ -291,6 +334,7 @@ public class Login extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton CreateBtn;
     private javax.swing.JLabel ExitBtn;
     private javax.swing.JButton LoginBtn;
     private javax.swing.JPasswordField PasswordTb;

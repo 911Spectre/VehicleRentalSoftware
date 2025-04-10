@@ -1,5 +1,4 @@
 package carrental;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
@@ -8,15 +7,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import net.proteanit.sql.DbUtils;
 
 
 public class Customers extends javax.swing.JFrame {
-
+    
     public Customers() {
         initComponents();
         Connect();
@@ -30,34 +27,33 @@ public class Customers extends javax.swing.JFrame {
     
     public void Connect() {
     try {
-            // Загружаем драйвер PostgreSQL
             Class.forName("org.postgresql.Driver");
             
-            // Подключаемся к базе данных
             Con = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/vehicledb",  // URL подключения
-                "sopakunovarslan",  // Имя пользователя базы данных
-                "911Spectre"        // Пароль
+                "jdbc:postgresql://localhost:5432/vehicledb",  
+                "sopakunovarslan",  
+                "911Spectre"        
             );
             
-            
-            // Сообщаем об успешном подключении
             System.out.println("Connected to the database successfully!");
 
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cars.class.getName()).log(Level.SEVERE, "PostgreSQL JDBC Driver not found!", ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(Cars.class.getName()).log(Level.SEVERE, "Database connection failed!", ex);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            System.out.print("PostgreSQL JDBC Driver not found!");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Database connection failed!");
         }
     }
     
-    private void Reset(){
+    private void Reset(){ 
         CustIdTb.setText("");
         CustNameTb.setText("");
         CustAddressTb.setText("");
         CustPhoneTb.setText("");
     }
             
+    // Display Customers on the table 
     private void DisplayCustomers(){
         try{
             St = Con.createStatement();
@@ -428,24 +424,24 @@ public class Customers extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, "Please Select The Customer To Be Updated!", "Input Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
-    
+
     // Validating Price as an integer
     int id;
     try {
-        id = Integer.parseInt(CustIdTb.getText());
+        id = Integer.parseInt(CustIdTb.getText().trim());
     } catch (NumberFormatException e) {
         JOptionPane.showMessageDialog(this, "Id must be a valid number!", "Input Error", JOptionPane.ERROR_MESSAGE);
         return;
     }
     
-    String Name = CustNameTb.getText();
-    String Address = CustAddressTb.getText();
-    String Phone = CustPhoneTb.getText();
+    String Name = CustNameTb.getText().trim();
+    String Address = CustAddressTb.getText().trim();
+    String Phone = CustPhoneTb.getText().trim();
     
     try {
         Statement St = Con.createStatement();
         
-        // Сначала проверяем, существует ли запись с таким ID
+        // Checking if customer exists
         String checkQuery = "SELECT COUNT(*) FROM customertable WHERE \"CustId\" = '" + id + "'";
         ResultSet rs = St.executeQuery(checkQuery);
         rs.next();
@@ -457,7 +453,7 @@ public class Customers extends javax.swing.JFrame {
             return;
         }
         
-        // Если запись существует, выполняем обновление
+        // Update if customer exist
         String Query = "UPDATE customertable SET \"CustName\" = '" + Name + 
                "', \"CustAddress\" = '" + Address + 
                "', \"CustPhone\" = '" + Phone + 
@@ -474,7 +470,7 @@ public class Customers extends javax.swing.JFrame {
             Reset();
         }
         } catch (SQLException e) {
-        e.printStackTrace(); // Print SQL errors
+        e.printStackTrace(); 
         }
     }//GEN-LAST:event_UpdateBtnActionPerformed
 
@@ -494,19 +490,19 @@ public class Customers extends javax.swing.JFrame {
         // Validating Price as an integer
         int id;
         try {
-            id = Integer.parseInt(CustIdTb.getText());
+            id = Integer.parseInt(CustIdTb.getText().trim());
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Id must be a valid number!", "Input Error", JOptionPane.ERROR_MESSAGE);
             CustIdTb.setText("");
             return;
         }
-
+        
         try {
             PreparedStatement add = Con.prepareStatement("INSERT INTO customertable VALUES(?,?,?,?)");
             add.setInt(1, id);
-            add.setString(2, CustNameTb.getText());
-            add.setString(3, CustAddressTb.getText());
-            add.setString(4, CustPhoneTb.getText());            
+            add.setString(2, CustNameTb.getText().trim());
+            add.setString(3, CustAddressTb.getText().trim());
+            add.setString(4, CustPhoneTb.getText().trim());            
 
             int k = add.executeUpdate();
             JOptionPane.showMessageDialog(this, "Customer Added Successfully!");
@@ -514,7 +510,7 @@ public class Customers extends javax.swing.JFrame {
             DisplayCustomers();
             Reset();
             
-            add.close(); // Closing the statement to free resources
+            add.close(); 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Customer with this Passport ID already exists");
             Reset();
@@ -623,9 +619,9 @@ public class Customers extends javax.swing.JFrame {
             fout.close();
             
         } catch (IOException ex) {
-            Logger.getLogger(Cars.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         } catch (SQLException ex) {
-            Logger.getLogger(Cars.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_ExportBtnActionPerformed
 

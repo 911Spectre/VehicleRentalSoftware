@@ -1,0 +1,16 @@
+Car Rental Program — Report
+
+During the development of this project, several technical issues were encountered, mostly related to database connectivity and handling dates in Java.
+
+1. Database Connection:
+At the beginning, there were problems connecting to the PostgreSQL database using JDBC. Although the dependency (`org.postgresql:postgresql:42.5.0`) was added to Maven, the connection could not be established due to version mismatches between the driver and the installed PostgreSQL. It was also necessary to manually specify connection parameters such as the URL, username, and password. The issue was resolved after carefully configuring the connection string and restarting the PostgreSQL server.
+
+2. Working with Dates:
+Another challenge was working with dates in Java — we had to use `java.util.Date`, `java.sql.Date`, and components from `JCalendar`. When trying to store a date into the database, there were type conversion issues. Also, JCalendar could not be added automatically through Maven, so we had to download it manually and add it to the project via NetBeans.
+
+3. Integrating All Components:
+One of the most difficult parts was connecting all modules into one functioning application. It was important to ensure that features such as adding cars, renting, returning, and exporting to CSV all worked properly. In particular, we had to make sure the car status updated correctly during rent and return operations, and that the interface tables always displayed up-to-date data.
+
+Despite the difficulties, in the end all parts of the project were successfully combined into a working software product.
+
+Arslan
