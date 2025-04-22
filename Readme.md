@@ -1,4 +1,5 @@
 # Car Rental Software
+# Presentation => https://www.canva.com/design/DAGkQcI3-Rc/BDE2Ylr5JASe7BIg1Ge29g/edit?utm_content=DAGkQcI3-Rc&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
 
 ## Description
 Car Rental Software is a Java-based desktop application for managing car rentals. Built with **Java Swing** and **PostgreSQL**, it supports managing car inventory, customers, rentals, and returns. Features include a splash screen, secure login, automatic fine calculations, and CSV exports. The system uses **Maven** for project management and is packaged as a JAR.
